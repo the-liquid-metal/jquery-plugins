@@ -1,0 +1,77 @@
+<style>
+.cardmenu, .cardmenu ul {margin: 0; padding: 0;}
+.cardmenu li {list-style-type: none; display: inline-block;}
+.cardmenu a, .cardmenu span {
+	display:block;
+	width: 100px;
+	height: 100px;
+	margin: 5px;
+	border:1px solid black;
+}
+
+body > ul > li > a,
+body > ul > li > span {background: lightblue;}
+
+body > ul > li > ul > li > a,
+body > ul > li > ul > li > span {background: pink;}
+
+body > ul > li > ul > li > ul > li > a,
+body > ul > li > ul > li > ul > li > span {background: lightgreen;}
+
+body > ul > li > ul > li > ul > li > ul > li > a,
+body > ul > li > ul > li > ul > li > ul > li > span {background: orange;}
+
+body > ul > li > ul > li > ul > li > ul > li > ul > li > a,
+body > ul > li > ul > li > ul > li > ul > li > ul > li > span {background: lightgrey;}
+
+body > ul > li > ul > li > ul > li > ul > li > ul > li > ul > li > a,
+body > ul > li > ul > li > ul > li > ul > li > ul > li > ul > li > span {background: lightyellow;}
+</style>
+<script src="jquery.js"></script>
+<script src="cardmenu.js"></script>
+<script>
+$(function () {
+	function createChild(level, prefix, baseLevel) {
+		prefix = prefix || "";
+		var baseLevel = baseLevel || level;
+		var children;
+		var sibling = "";
+		
+		var tab1 = ("\t\t").repeat(baseLevel - level);
+		var tab2 = tab1 + "\t";
+		var tab3 = tab1 + "\t\t";
+		var tab4 = tab1 + "\t\t\t";
+		
+		for (var s = 1; s < 6; s++) {
+			var newPrefix = prefix + '.' + s;
+			if (level > 2) {
+				children = createChild(level - 1, newPrefix, baseLevel);
+			} else {
+				children = "";
+				for (var i = 1; i < 6; i++) {
+					children += tab4 + '<li><a href="#">child-' + newPrefix + '.' + i + '</a></li>\n';
+				}
+				children = tab3 + "<ul>\n" + children + tab3 + "</ul>\n";
+			}
+			sibling += tab2 + '<li>\n' + tab3 + '<a href="#">child-' + newPrefix + '</a>\n' + children + tab2 + '</li>\n';
+		}
+		var retVal = tab1 + "<ul>\n" + sibling + tab1 + "</ul>\n";
+		return retVal.replace(/-\./g, '-');
+	}
+	
+	var list1 = createChild(5);
+	$(list1).appendTo("body").cardmenu();
+	
+	var list2 = list1.replace(/\ba\b/g, 'span');
+	$(list2).appendTo("body").cardmenu({itemCard: "span"});
+	
+	var list3 = "" + list2;
+	var $list3 = $(list3);
+	$list3.find("ul").prepend('<li><span class="to-parent">To Parent</span></li>');
+	$list3.appendTo("body").cardmenu({
+		createUpCard: false,
+		upCard: ".to-parent",
+		itemCard: "span"
+	});
+});
+</script>
